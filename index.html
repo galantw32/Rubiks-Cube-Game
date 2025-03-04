@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Rubik's Cube</title>
+    <title>Tic-Tac-Toe</title>
     <style>
-        body { margin: 0; }
-        canvas { display: block; }
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #game { text-align: center; }
+        .board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; margin-bottom: 20px; }
+        .cell { width: 100px; height: 100px; font-size: 40px; border: 1px solid black; display: flex; justify-content: center; align-items: center; cursor: pointer; }
     </style>
 </head>
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <div id="game">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="board" id="board"></div>
+        <p id="status"></p>
+        <button id="restart">Restart Game</button>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
