@@ -1,42 +1,59 @@
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+const board = document.getElementById('board');
+const status = document.getElementById('status');
+const restartBtn = document.getElementById('restart');
+let currentPlayer = 'X';
+let gameBoard = ['', '', '', '', '', '', '', '', ''];
+let gameActive = true;
 
-const cubeSize = 1;
-const spacing = 0.1;
-
-function createCubePiece(x, y, z) {
-    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
-    const materials = [
-        new THREE.MeshBasicMaterial({color: 0xff0000}), // Red
-        new THREE.MeshBasicMaterial({color: 0xff8c00}), // Orange
-        new THREE.MeshBasicMaterial({color: 0xffffff}), // White
-        new THREE.MeshBasicMaterial({color: 0xffff00}), // Yellow
-        new THREE.MeshBasicMaterial({color: 0x00ff00}), // Green
-        new THREE.MeshBasicMaterial({color: 0x0000ff})  // Blue
-    ];
-    const cube = new THREE.Mesh(geometry, materials);
-    cube.position.set(x * (cubeSize + spacing), y * (cubeSize + spacing), z * (cubeSize + spacing));
-    return cube;
-}
-
-for (let x = -1; x <= 1; x++) {
-    for (let y = -1; y <= 1; y++) {
-        for (let z = -1; z <= 1; z++) {
-            const piece = createCubePiece(x, y, z);
-            scene.add(piece);
-        }
+function createBoard() {
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.setAttribute('data-index', i);
+        cell.addEventListener('click', handleCellClick);
+        board.appendChild(cell);
     }
 }
 
-camera.position.z = 5;
-
-function animate() {
-    requestAnimationFrame(animate);
-    scene.rotation.x += 0.01;
-    scene.rotation.y += 0.01;
-    renderer.render(scene, camera);
+function handleCellClick(e) {
+    const index = e.target.getAttribute('data-index');
+    if (gameBoard[index] !== '' || !gameActive) return;
+    
+    gameBoard[index] = currentPlayer;
+    e.target.textContent = currentPlayer;
+    
+    if (checkWin()) {
+        status.textContent = `Player ${currentPlayer} wins!`;
+        gameActive = false;
+    } else if (gameBoard.every(cell => cell !== '')) {
+        status.textContent = "It's a draw!";
+        gameActive = false;
+    } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        status.textContent = `Player ${currentPlayer}'s turn`;
+    }
 }
-animate();
+
+function checkWin() {
+    const winConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6] // Diagonals
+    ];
+    
+    return winConditions.some(condition => {
+        return condition.every(index => gameBoard[index] === currentPlayer);
+    });
+}
+
+function restartGame() {
+    gameBoard = ['', '', '', '', '', '', '', '', ''];
+    gameActive = true;
+    currentPlayer = 'X';
+    status.textContent = `Player ${currentPlayer}'s turn`;
+    document.querySelectorAll('.cell').forEach(cell => cell.textContent = '');
+}
+
+createBoard();
+restartBtn.addEventListener('click', restartGame);
+status.textContent = `Player ${currentPlayer}'s turn`;
